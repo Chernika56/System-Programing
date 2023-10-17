@@ -5,8 +5,6 @@
 #include "Functions.h"
 #include "resource.h"
 
-// all buttons generate redraw
-// double buffer doesn't work, work worse than single buffer
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
