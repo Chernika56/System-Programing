@@ -1,0 +1,5 @@
+﻿  Source.cpp
+D:\БГУИР\lab1\lab1\lab1\Functions.h(15,19): warning C4311: приведение типов: усечение указателя из "HKL" в "int"
+D:\БГУИР\lab1\lab1\lab1\Functions.h(15,19): warning C4302: приведение типов: усечение из "HKL" к "int"
+D:\БГУИР\lab1\lab1\lab1\Functions.h(34,11): warning C4244: инициализация: преобразование "LPARAM" в "int", возможна потеря данных
+  lab1.vcxproj -> D:\БГУИР\lab1\lab1\x64\Debug\lab1.exe
