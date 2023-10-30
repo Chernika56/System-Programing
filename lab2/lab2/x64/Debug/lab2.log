@@ -1,0 +1,4 @@
+﻿  Source.cpp
+D:\БГУИР\SystemProgramming\lab2\lab2\TextFormatter.h(30,17): warning C4244: return: преобразование "double" в "int", возможна потеря данных
+D:\БГУИР\SystemProgramming\lab2\lab2\Source.cpp(67,22): warning C4244: аргумент: преобразование "FLOAT" в "int", возможна потеря данных
+  lab2.vcxproj -> D:\БГУИР\SystemProgramming\lab2\lab2\x64\Debug\lab2.exe
