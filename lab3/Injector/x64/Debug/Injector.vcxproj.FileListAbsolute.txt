@@ -1,0 +1,2 @@
+D:\БГУИР\SystemProgramming\lab3\Injector\x64\Debug\Injector.exe
+D:\BSUIR\SystemProgramming\lab3\Injector\x64\Debug\Injector.exe

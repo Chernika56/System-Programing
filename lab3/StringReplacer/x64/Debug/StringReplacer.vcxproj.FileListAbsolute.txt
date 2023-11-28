@@ -1,0 +1,2 @@
+D:\БГУИР\SystemProgramming\lab3\StringReplacer\x64\Debug\StringReplacer.dll
+D:\BSUIR\SystemProgramming\lab3\StringReplacer\x64\Debug\StringReplacer.dll

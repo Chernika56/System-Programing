@@ -1,0 +1,6 @@
+﻿  StringReplacer.cpp
+D:\BSUIR\SystemProgramming\lab3\StringReplacer\StringReplacer.cpp(27,6): warning C4273: changeTextInProcces: несовместимое связывание dll
+D:\BSUIR\SystemProgramming\lab3\StringReplacer\StringReplacer.h(3,39): message : см. предыдущее определение "changeTextInProcces"
+D:\BSUIR\SystemProgramming\lab3\StringReplacer\StringReplacer.cpp(58,56): warning C4244: аргумент: преобразование "SIZE_T" в "int", возможна потеря данных
+D:\BSUIR\SystemProgramming\lab3\StringReplacer\StringReplacer.cpp(75,36): warning C4244: =: преобразование "SIZE_T" в "int", возможна потеря данных
+  StringReplacer.vcxproj -> D:\BSUIR\SystemProgramming\lab3\StringReplacer\x64\Debug\StringReplacer.dll
