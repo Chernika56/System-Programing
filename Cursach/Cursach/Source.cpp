@@ -5,9 +5,10 @@
 #include <ctime>
 #include <atomic>
 #include <sstream>
+#include <list>
+#include <chrono>
 
 std::vector<std::thread> circleThreads;
-std::vector<std::pair<int, int>> circles;
 std::atomic<bool> drawCircles(true);
 std::wstring cursorInfo;
 
@@ -19,16 +20,34 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK InputWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK CircleWndProc(HWND, UINT, WPARAM, LPARAM);
 
+// Структура для хранения информации о щелчке
+class CircleEvent {
+public:
+	int x;
+	int y;
+	std::chrono::steady_clock::time_point appearanceTimestamp;
+	std::chrono::steady_clock::time_point removalTimestamp;
+
+	CircleEvent(int _x, int _y, std::chrono::steady_clock::time_point _appearanceTimestamp, 
+		std::chrono::steady_clock::time_point _removalTimestamp)
+		: x(_x), y(_y), appearanceTimestamp(_appearanceTimestamp), removalTimestamp(_removalTimestamp) {}
+
+	void setRemovalTimestamp(std::chrono::steady_clock::time_point removalTime) {
+		removalTimestamp = removalTime;
+	}
+};
+
+// Очередь для хранения событий щелчков
+std::list<CircleEvent> circleEventsList;
+
 void DrawCircles(HWND hwnd) 
 {
 	while (drawCircles) 
 	{
 		Sleep(5000 / speed);
 
-		int x = rand() % 1000;
-		int y = rand() % 800;
-
-		circles.push_back(std::make_pair(x, y));
+		int x = rand() % 800 + 50;
+		int y = rand() % 600 + 50;
 
 		HDC hdc = GetDC(hwnd);
 		HBRUSH brush = CreateSolidBrush(RGB(rand() % 256, rand() % 256, rand() % 256));
@@ -36,6 +55,9 @@ void DrawCircles(HWND hwnd)
 		Ellipse(hdc, x - 25, y - 25, x + 25, y + 25);
 		DeleteObject(brush);
 		ReleaseDC(hwnd, hdc);
+
+		std::chrono::steady_clock::time_point appearanceTime = std::chrono::steady_clock::now();
+		circleEventsList.push_back(CircleEvent(x, y, appearanceTime, appearanceTime));
 	}
 }
 
@@ -120,7 +142,7 @@ void CreateCircleWindow() {
     hwndCyrcle = CreateWindow(
         _T("CircleWindowClass"), _T("Окно с кругами"),
         WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, 1000, 800,
+		0, 0, 1000, 800,
         NULL, NULL, hInst, NULL
     );
 
@@ -218,7 +240,7 @@ LRESULT CALLBACK InputWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 LRESULT CALLBACK CircleWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
 	case WM_CREATE:
-		circles.clear();
+		circleEventsList.clear();
 		srand(time(nullptr));
 		std::thread(DrawCircles, hWnd).detach();
 
@@ -239,19 +261,23 @@ LRESULT CALLBACK CircleWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			int mouseX = cursorPos.x;
 			int mouseY = cursorPos.y;
 
-			for (size_t i = 0; i < circles.size(); i++)
+			for (auto it = circleEventsList.begin(); it != circleEventsList.end(); it++)
 			{
-				int x = circles[i].first;
-				int y = circles[i].second;
+				int x = it->x;
+				int y = it->y;
 
 				if ((mouseX - x) * (mouseX - x) + (mouseY - y) * (mouseY - y) <= 25 * 25)
 				{
-					circles.erase(circles.begin() + i);
+					std::chrono::steady_clock::time_point removalTime = std::chrono::steady_clock::now();
+					it->setRemovalTimestamp(removalTime);
+
+					circleEventsList.erase(it);
 
 					InvalidateRect(hWnd, NULL, TRUE);
 					break;
 				}
-			}
+			}	
+		
 		}
 	}
 	break;
@@ -259,14 +285,17 @@ LRESULT CALLBACK CircleWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 	{
 		int mouseX = LOWORD(lParam);
 		int mouseY = HIWORD(lParam);
-		for (size_t i = 0; i < circles.size(); i++)
+		for (auto it = circleEventsList.begin(); it != circleEventsList.end(); it++)
 		{
-			int x = circles[i].first;
-			int y = circles[i].second;
+			int x = it->x;
+			int y = it->y;
 
 			if ((mouseX - x) * (mouseX - x) + (mouseY - y) * (mouseY - y) <= 25 * 25)
 			{
-				circles.erase(circles.begin() + i);
+				std::chrono::steady_clock::time_point removalTime = std::chrono::steady_clock::now();
+				it->setRemovalTimestamp(removalTime);
+
+				circleEventsList.erase(it);
 
 				InvalidateRect(hWnd, NULL, TRUE);
 				break;
@@ -283,10 +312,10 @@ LRESULT CALLBACK CircleWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
 
-		for (const auto& circle : circles)
+		for (auto it = circleEventsList.begin(); it != circleEventsList.end(); it++)
 		{
-			int x = circle.first;
-			int y = circle.second;
+			int x = it->x;
+			int y = it->y;
 
 			HBRUSH brush = CreateSolidBrush(RGB(rand() % 256, rand() % 256, rand() % 256));
 			SelectObject(hdc, brush);
@@ -302,7 +331,7 @@ LRESULT CALLBACK CircleWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 		{
 			thread.join();
 		}
-		circles.clear();
+		//circleEventsList.clear();
 		DestroyWindow(hWnd);
 
 		break;
