@@ -131,7 +131,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Constant.h" />
-    <ClInclude Include="Function.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
